@@ -6,7 +6,7 @@ Vite build setup, SCSS architecture, and Bootstrap 5 theming for TYPO3 v13+ site
 
 ### Claude Code Marketplace
 
-```
+```bash
 claude install netresearch/typo3-vite-skill
 ```
 
