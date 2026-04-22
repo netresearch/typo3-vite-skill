@@ -1,6 +1,6 @@
 ---
 name: typo3-vite
-description: "Vite build setup for TYPO3 v13+ and v14 LTS (v14 removed core asset concat/compression #108055 — external build tool is now mandatory) with vite-asset-collector, SCSS architecture, Bootstrap 5.3 theming (v14 backend bundles Bootstrap 5.3.2), SVG optimization, code splitting, CSP compliance. Use when configuring Vite for TYPO3 projects, setting up SCSS with Bootstrap, creating entrypoints per content element, optimizing SVGs, configuring PostCSS (autoprefixer, cssnano), loading local fonts, setting up CSS units, customizing Bootstrap variables. Also triggers for: asset hashing, Gzip/Brotli compression, SCSS import chain, global-basics.scss, selective Bootstrap imports, post-v14 frontend build pipelines."
+description: "Use when configuring Vite 7 for TYPO3 v13/v14 LTS projects, setting up SCSS architecture with Bootstrap 5.3 theming, creating entrypoints per content element, optimizing SVGs, configuring PostCSS (autoprefixer, cssnano), loading local fonts, or customizing Bootstrap variables. v14 removed core asset concat/compression (#108055) — external build tool is now mandatory. Also triggers for: vite-asset-collector, asset hashing, Gzip/Brotli compression, SCSS import chain, selective Bootstrap imports, CSP compliance, post-v14 frontend build pipelines."
 ---
 
 # TYPO3 Vite Skill

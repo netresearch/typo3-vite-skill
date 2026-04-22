@@ -26,4 +26,13 @@ composer require netresearch/typo3-vite-skill
 
 ## License
 
-MIT
+This project uses split licensing:
+
+- Code (`scripts/**`, `.github/workflows/**`, config files) is licensed under the [MIT License](LICENSE-MIT).
+- Documentation and skill content (`skills/**`, `references/**`, `README.md`) is licensed under [CC-BY-SA-4.0](LICENSE-CC-BY-SA-4.0).
+
+SPDX expression: `(MIT AND CC-BY-SA-4.0)`.
+
+## Maintainer
+
+Maintained by [Netresearch DTT GmbH](https://www.netresearch.de).

@@ -2,8 +2,11 @@
   "name": "netresearch/typo3-vite-skill",
   "description": "Vite build setup, SCSS architecture, Bootstrap theming for TYPO3 v13+",
   "type": "ai-agent-skill",
-  "license": "MIT",
+  "license": "(MIT AND CC-BY-SA-4.0)",
   "require": {
     "netresearch/composer-agent-skill-plugin": "*"
+  },
+  "extra": {
+    "ai-agent-skill": "skills/typo3-vite/SKILL.md"
   }
 }
