@@ -258,14 +258,17 @@ manifest mode — the extension default `useDevServer = auto` resolves to
 makes `<vite:asset>` chase a dev server that is not running:
 
 ```php
+<?php
 // config/system/settings.php
-'EXTENSIONS' => [
-    'vite_asset_collector' => [
-        'useDevServer' => '0',
-        'devServerUri' => 'auto',
-        'defaultManifest' => '_assets/vite/.vite/manifest.json',
+return [
+    'EXTENSIONS' => [
+        'vite_asset_collector' => [
+            'useDevServer' => '0',
+            'devServerUri' => 'auto',
+            'defaultManifest' => '_assets/vite/.vite/manifest.json',
+        ],
     ],
-],
+];
 ```
 
 Two non-obvious rules apply:
