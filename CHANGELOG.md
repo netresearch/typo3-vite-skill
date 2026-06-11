@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.0] - 2026-06-11
+
+### Added
+
+- **`references/vite-configuration.md`** new "Manifest Mode (No Dev Server)"
+  section for build-time-only asset workflows. Documents forcing
+  `useDevServer = '0'` (the `auto` default resolves to
+  `Environment::getContext()->isDevelopment()`, so any `Development/*`
+  context without a running HMR server breaks `<vite:asset>`),
+  pre-populating the complete `vite_asset_collector` key set in
+  `settings.php` (a missing key triggers a synchronize that writes the
+  file — on sealed/read-only `settings.php` this throws core exception
+  `#1346323822` and the frontend returns HTTP 500), and why
+  `vite-plugin-typo3` project-mode output aligns with the extension's
+  `defaultManifest` so `<vite:asset>` needs no `manifest` argument.
+  Includes a deployment note: keep the toolchain at the Composer project
+  root so `node_modules` stays out of copied extension paths.
+
 ## [1.3.1] - 2026-05-06
 
 ### Added
