@@ -27,6 +27,10 @@ Custom `SvgCopyOptimizePlugin` processes SVGs from `Resources/Private/Svg/` thro
 
 Assets loaded via `<vite:asset>` ViewHelper automatically get nonce attributes for Content Security Policy compliance. No inline `<script>` or `<style>` tags needed.
 
+### Dev Server `allowedHosts` Trap
+
+Vite 7.3+ and 8.x enforce host-header checks: without `allowedHosts: true` and `cors: true` in the `server:` block, the dev server returns HTTP 403 "Blocked request" for any host header other than `localhost` -- breaking HMR behind a reverse proxy (Traefik, nginx). Vite 7.1.x didn't enforce this, so a missing `allowedHosts` "worked" until upgrading. Set both options **inside the single existing `server:` block** -- a second `server: { ... }` literal silently overwrites the first's keys (including `allowedHosts`) without warning. See `references/vite-configuration.md`.
+
 ## Technology Stack
 
 | Layer | Technology |
