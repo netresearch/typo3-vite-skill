@@ -22,7 +22,7 @@ composer require netresearch/typo3-vite-skill
 |---|---|
 | `references/vite-configuration.md` | Complete vite.config.ts, entrypoints, SVG optimization plugin, CSP compliance |
 | `references/scss-architecture.md` | SCSS folder structure, import chain, naming conventions, CSS units |
-| `references/bootstrap-theming.md` | Bootstrap 5.3+ variable customization, theming flow, checklist |
+| `references/bootstrap-theming.md` | SCSS theming flow, CI-color mapping, selective Bootstrap imports |
 
 ## License
 

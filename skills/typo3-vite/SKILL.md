@@ -43,4 +43,4 @@ Assets loaded via `<vite:asset>` ViewHelper automatically get nonce attributes f
 
 - `references/vite-configuration.md` -- Complete vite.config.ts, entrypoints, SVG plugin, CSP
 - `references/scss-architecture.md` -- SCSS folder structure, import chain, naming conventions, CSS units
-- `references/bootstrap-theming.md` -- Bootstrap variable customization per project
+- `references/bootstrap-theming.md` -- SCSS theming flow, CI-color mapping, selective Bootstrap imports
