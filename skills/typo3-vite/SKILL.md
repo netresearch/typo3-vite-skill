@@ -29,7 +29,7 @@ Assets loaded via `<vite:asset>` ViewHelper automatically get nonce attributes f
 
 ### Dev Server `allowedHosts` Trap
 
-Vite 7.3+ and 8.x enforce host-header checks: without `allowedHosts: true` and `cors: true` in the `server:` block, the dev server returns HTTP 403 "Blocked request" for any host header other than `localhost` -- breaking HMR behind a reverse proxy (Traefik, nginx). Vite 7.1.x didn't enforce this, so a missing `allowedHosts` "worked" until upgrading. Set both options **inside the single existing `server:` block** -- a second `server: { ... }` literal silently overwrites the first's keys (including `allowedHosts`) without warning. See `references/vite-configuration.md`.
+Vite enforces host-header checks by default: without `allowedHosts: true` and `cors: true` in the `server:` block, the dev server returns HTTP 403 "Blocked request" for any host header other than `localhost` -- breaking HMR behind a reverse proxy (Traefik, nginx). This has been the default since the [GHSA-vg6x-rcgg-rjx6](https://github.com/vitejs/vite/security/advisories/GHSA-vg6x-rcgg-rjx6) fix (4.5.6/5.4.12/6.0.9) -- every Vite 7.x/8.x release enforces it, there's no pre-fix version to worry about on this stack. Set both options **inside the single existing `server:` block** -- a second `server: { ... }` literal silently overwrites the first's keys (including `allowedHosts`) without warning. See `references/vite-configuration.md`.
 
 ## Technology Stack
 
