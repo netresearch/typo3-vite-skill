@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.6.0] - 2026-07-13
+
+### Added
+
+- **`SKILL.md`** new "Dev Server `allowedHosts` Trap" section: without
+  `allowedHosts: true` and `cors: true` in the `server:` block, the Vite
+  dev server returns HTTP 403 "Blocked request" for any host header other
+  than `localhost`, breaking HMR behind a reverse proxy (Traefik, nginx).
+  Also warns that a second `server: { ... }` literal silently overwrites
+  the first one's keys.
+
+### Changed
+
+- **`references/vite-configuration.md`** corrected the `allowedHosts`
+  version boundary claim: host-header enforcement is not a Vite 7.3
+  cutoff — it has been the default since the fix for
+  [GHSA-vg6x-rcgg-rjx6](https://github.com/vitejs/vite/security/advisories/GHSA-vg6x-rcgg-rjx6)
+  (CVE-2025-24010, landed in 4.5.6/5.4.12/6.0.9), so every Vite 7.x/8.x
+  release enforces it.
+
+### Removed
+
+- **`references/bootstrap-theming.md`** cut generic Bootstrap/SCSS
+  tutorial content (~200 lines); the reference now covers the SCSS
+  theming flow, CI-color mapping, and selective Bootstrap imports.
+
 ## [1.5.0] - 2026-06-11
 
 ### Added
