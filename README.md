@@ -22,8 +22,17 @@ composer require netresearch/typo3-vite-skill
 |---|---|
 | `references/vite-configuration.md` | Complete vite.config.ts, entrypoints, SVG optimization plugin, CSP compliance |
 | `references/scss-architecture.md` | SCSS folder structure, import chain, naming conventions, CSS units |
-| `references/bootstrap-theming.md` | Bootstrap 5.3+ variable customization, theming flow, checklist |
+| `references/bootstrap-theming.md` | SCSS theming flow, CI-color mapping, selective Bootstrap imports |
 
 ## License
 
-MIT
+This project uses split licensing:
+
+- Code (`scripts/**`, `.github/workflows/**`, config files) is licensed under the [MIT License](LICENSE-MIT).
+- Documentation and skill content (`skills/**`, `references/**`, `README.md`) is licensed under [CC-BY-SA-4.0](LICENSE-CC-BY-SA-4.0).
+
+SPDX expression: `(MIT AND CC-BY-SA-4.0)`.
+
+## Maintainer
+
+Maintained by [Netresearch DTT GmbH](https://www.netresearch.de).

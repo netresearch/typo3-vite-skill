@@ -91,9 +91,28 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         origin: 'http://localhost:5173',
+        // Required (all Vite 7.x/8.x) when accessed via reverse proxy (Traefik etc.)
+        // Without these, the dev server returns HTTP 403 "Blocked request" for any
+        // host header other than 'localhost' — even if the host appears to be
+        // routed correctly. true = allow all hosts (use array for narrower scope).
+        allowedHosts: true,
+        cors: true,
     },
 });
 ```
+
+> **Anti-pattern: duplicate `server:` blocks.** Define `server:` exactly once in
+> `defineConfig({ ... })`. JavaScript object literals **silently overwrite**
+> earlier keys with later ones, so two `server: { ... }` blocks lose the first
+> one's options without warning. If you add `allowedHosts`, put it inside the
+> existing `server` block — do not create a second one.
+>
+> **Not a version-specific quirk.** Host-header enforcement isn't a 7.x
+> cutoff -- it's been the default since the fix for
+> [GHSA-vg6x-rcgg-rjx6](https://github.com/vitejs/vite/security/advisories/GHSA-vg6x-rcgg-rjx6)
+> (CVE-2025-24010), which landed in Vite 4.5.6, 5.4.12, and 6.0.9. Every
+> Vite 7.x/8.x release inherits it, so `allowedHosts` is required on any
+> supported version once you're accessed via a non-`localhost` host.
 
 ## Entrypoints
 
@@ -155,9 +174,55 @@ The custom `SvgCopyOptimizePlugin` processes SVGs from `Resources/Private/Svg/` 
 - Writes optimized files to `Resources/Public/Svg/`
 - Watches for changes in dev mode (add/change/delete)
 - Tracks processed files to avoid redundant work
+- Skips re-optimization when the output file is newer than its source (see below)
 - Logs optimization stats (original size vs optimized)
 
 The plugin source lives in `vite.helpers.ts` and is imported in `vite.config.ts`.
+
+### Skipping unchanged sources between builds
+
+The in-memory `processedFiles` map only protects against duplicate work
+*within* a single Vite process. Between builds (`vite build` re-runs, fresh
+container starts, CI), the map is empty, so without an additional check every
+SVG would be re-optimized on every build.
+
+Compute the output path **before** reading the source, then short-circuit when
+`output.mtime >= source.mtime`:
+
+```js
+const parsed = resolve(rel).split('/').pop().replace('.svg', '');
+const outName = slugify(parsed) + '.svg';
+const outPath = resolve(outDir, outName);
+
+// Skip re-optimization if the existing output is newer than the source.
+// Saves the read + SVGO call entirely on subsequent builds.
+if (!changedFile && existsSync(outPath)) {
+    const outStats = statSync(outPath);
+    if (outStats.mtime.getTime() >= lastModified) {
+        processedFiles.set(srcPath, Date.now());
+        skippedFiles.push(`Public/Svg/${outName}`);
+        continue;
+    }
+}
+
+// only reached when the output is missing or older than the source:
+const raw = await fs.readFile(srcPath, 'utf8');
+const result = optimize(raw, { path: srcPath, ...svgoConfig });
+await fs.writeFile(outPath, result.data, 'utf8');
+```
+
+Two important orderings:
+
+1. `outPath` must be computed **before** the `existsSync` check (and therefore
+   before `fs.readFile`/`optimize()`). Otherwise the skip block has nothing to
+   compare against and the savings disappear.
+2. The `!changedFile` guard ensures explicit dev-server `change`/`add` events
+   always re-optimize. The skip only triggers in full-build runs.
+
+Caveat: this relies on filesystem mtimes. On CI runners that wipe
+`Resources/Public/Svg/` between jobs, the skip cannot fire — either commit the
+optimized output, cache the directory between pipeline runs, or layer a
+content-hash manifest on top.
 
 ### svgo.config.js
 
@@ -186,6 +251,49 @@ For local development:
 2. The `vite-asset-collector` extension detects the dev server and serves assets from it
 3. CSS changes are injected without page reload
 4. TypeScript changes trigger a page reload
+
+## Manifest Mode (No Dev Server)
+
+Not every workflow runs an HMR server. If assets are built at install or
+image-build time (`vite build`) and only the manifest is ever served, force
+manifest mode — the extension default `useDevServer = auto` resolves to
+`Environment::getContext()->isDevelopment()`, so any `Development/*` context
+makes `<vite:asset>` chase a dev server that is not running:
+
+```php
+<?php
+// config/system/settings.php
+return [
+    'EXTENSIONS' => [
+        'vite_asset_collector' => [
+            'useDevServer' => '0',
+            'devServerUri' => 'auto',
+            'defaultManifest' => '_assets/vite/.vite/manifest.json',
+        ],
+    ],
+];
+```
+
+Two non-obvious rules apply:
+
+- **Pre-populate the complete key set** (`useDevServer`, `devServerUri`,
+  `defaultManifest`) — not just the key you override. On sites that keep
+  `settings.php` read-only (e.g. sealed `chmod 0444`, secret-free managed
+  config), `ExtensionConfiguration::get()` with a path missing from
+  `settings.php` triggers a synchronize that **writes** the file; on the sealed
+  file that throws core exception `#1346323822` ("settings.php is not
+  writable") and the frontend returns HTTP 500. A complete block keeps every
+  read path valid, so no write is ever attempted.
+- **The defaults align by design**: `vite-plugin-typo3` project mode outputs to
+  `<web-dir>/_assets/vite/` with the manifest at
+  `_assets/vite/.vite/manifest.json` — exactly the extension's
+  `defaultManifest`. `<vite:asset entry="EXT:..." />` therefore needs no
+  `manifest` argument.
+
+For Docker/deployment images that `COPY` extension or package directories,
+keep `package.json` and `vite.config.js` at the Composer project root (not
+inside an extension): `node_modules` then never sits inside a copied path, and
+only the built `_assets/vite/` output ships.
 
 ## CSP Compliance
 
