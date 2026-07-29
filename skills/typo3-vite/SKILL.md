@@ -31,6 +31,10 @@ Assets loaded via `<vite:asset>` ViewHelper automatically get nonce attributes f
 
 Vite enforces host-header checks by default: without `allowedHosts: true` and `cors: true` in the `server:` block, the dev server returns HTTP 403 "Blocked request" for any host header other than `localhost` -- breaking HMR behind a reverse proxy (Traefik, nginx). This has been the default since the [GHSA-vg6x-rcgg-rjx6](https://github.com/vitejs/vite/security/advisories/GHSA-vg6x-rcgg-rjx6) fix (4.5.6/5.4.12/6.0.9) -- every Vite 7.x/8.x release enforces it, there's no pre-fix version to worry about on this stack. Set both options **inside the single existing `server:` block** -- a second `server: { ... }` literal silently overwrites the first's keys (including `allowedHosts`) without warning. See `references/vite-configuration.md`.
 
+### Stale Page Cache After a Build Trap
+
+Every `vite build` mints new content hashes and deletes the previous files, but the rendered markup keeps sitting in TYPO3's page cache with the old names -- the browser then 404s on `main.entry-<oldhash>.js` and the page loads with **no JavaScript and no CSS** while still rendering normally. It presents as a broken feature, not a broken asset. Run `vendor/bin/typo3 cache:flush` as part of the build, and verify what is served (`curl -sk <url> | grep -oE '_assets/vite/(js|css)/[^"]+'` against `ls public/_assets/vite/`) rather than trusting the build timestamp. Any behavioural measurement taken against a page in this state is void -- especially one meant to prove that something does *not* happen, because an unloaded bundle and a correctly idle one look identical. See `references/vite-configuration.md`.
+
 ## Technology Stack
 
 | Layer | Technology |

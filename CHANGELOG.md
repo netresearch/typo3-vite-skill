@@ -1,5 +1,24 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`SKILL.md`** new "Stale Page Cache After a Build Trap" section: `vite build`
+  mints new content hashes and deletes the previous files, while the rendered
+  markup stays in TYPO3's page cache with the old names — the page then 404s on
+  its entrypoints and loads with no JavaScript and no CSS while still rendering,
+  so it presents as a broken feature rather than a broken asset reference.
+  `vendor/bin/typo3 cache:flush` belongs to the build step.
+- **`references/vite-configuration.md`** new "Flush the page cache after every
+  build" subsection under Manifest Mode: the flush command, a `curl`/`ls`
+  comparison to verify what is actually served, the note that hashes only change
+  for entrypoints whose output changed (a SCSS comment leaves the CSS hash
+  untouched, a TypeScript comment does change the JS hash), and the warning that
+  a measurement asserting the *absence* of an effect cannot distinguish an
+  unloaded bundle from a correctly idle one without positive proof that the code
+  ran.
+
 ## [1.6.0] - 2026-07-13
 
 ### Added
