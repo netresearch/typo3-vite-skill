@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-07-30
+
 ### Added
 
 - **`SKILL.md`** new "Stale Page Cache After a Build Trap" section: `vite build`
