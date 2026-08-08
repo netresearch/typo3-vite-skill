@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-08-08
+
+### Added
+
+- Add Agent Plugins 1.0.0 portable manifest (manifest)
+
 ## [1.7.0] - 2026-07-30
 
 ### Added
