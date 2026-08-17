@@ -1,0 +1,348 @@
+[
+  {
+    "name": "single-server-block-with-allowed-hosts",
+    "prompt": "Our TYPO3 sitepackage runs Vite behind Traefik and the dev server answers 403 \"Blocked request\" for every host except localhost. Our vite.config.ts already has a `server: { host: '0.0.0.0', port: 5173, strictPort: true }` block. Show me what to change.",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "allowedHosts",
+        "description": "Names allowedHosts as the option that resolves the host-header rejection"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(one|single|existing|same) server|do not (create|add) a second|only once|exactly once",
+        "description": "Puts the option inside the existing server block instead of adding a second one"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)overwrit|shadow|silently|last (one|key) wins|duplicate key",
+        "description": "Explains why a second server block is a defect: a repeated object key silently discards the earlier one"
+      },
+      {
+        "type": "content_regex",
+        "value": "7\\.3|8\\.x|host header|proxy",
+        "description": "Ties the 403 to host-header enforcement from Vite 7.3 onwards behind a reverse proxy"
+      }
+    ],
+    "samples": {
+      "passing": "Add allowedHosts inside the existing server block — define server exactly once, because a second server: { ... } literal silently overwrites the first one's options and you would lose host and strictPort. Vite enforces the host header from 7.3 onwards, so behind a proxy every host but localhost gets a 403 until allowedHosts is set.",
+      "failing": [
+        "Add a second server block below the existing one containing allowedHosts: true. Object keys merge, so both sets of options apply.",
+        "That is a Traefik misconfiguration. Set the X-Forwarded-Host header in your router and restart the proxy."
+      ]
+    }
+  },
+  {
+    "name": "v14-requires-external-build-tool",
+    "prompt": "We are upgrading a TYPO3 site to v14 and want to drop Vite again, going back to config.concatenateCss and config.compressJs in TypoScript. Any reason not to?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "108055|107944",
+        "description": "Cites the v14 breaking change that removed frontend asset concatenation and compression"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(no|without) (longer )?(any )?effect|removed|no-op|ignored",
+        "description": "States that the TypoScript options no longer do anything on v14 rather than merely discouraging them"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(external|separate) build|vite|webpack|esbuild",
+        "description": "Names an external build tool as the required replacement"
+      }
+    ],
+    "samples": {
+      "passing": "On v14 those options are removed and have no effect: breaking change #108055 dropped frontend asset concatenation and compression, and #107944 dropped CSS comment and whitespace stripping. An external build tool — Vite, webpack or esbuild — is required for production asset handling, so keep Vite.",
+      "failing": [
+        "Sure, TypoScript concatenation is still the simplest option: set config.concatenateCss = 1 and config.compressJs = 1 and you can remove the Vite pipeline.",
+        "Both approaches work equally well on v14; pick whichever your team prefers."
+      ]
+    }
+  },
+  {
+    "name": "manifest-mode-complete-key-set",
+    "prompt": "Our TYPO3 v14 site builds assets at image-build time with `vite build` and never runs an HMR server, but the frontend still tries to load assets from localhost:5173 in our Development context. config/system/settings.php is committed read-only. How do we configure vite_asset_collector?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "useDevServer",
+        "description": "Forces manifest mode via the useDevServer extension setting instead of leaving it on auto"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(all|every|complete|three) (the )?keys|devServerUri.*defaultManifest|defaultManifest.*devServerUri",
+        "description": "Pre-populates the complete key set, not just the overridden key"
+      },
+      {
+        "type": "content_regex",
+        "value": "1346323822|not writable|500|synchroniz",
+        "description": "Names the failure mode a missing key causes on a sealed settings.php: a write attempt, an uncaught exception and HTTP 500"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)auto|isDevelopment|Development",
+        "description": "Explains that the auto default resolves via the application context, which is why a Development context chases a dev server that is not running"
+      }
+    ],
+    "samples": {
+      "passing": "Set useDevServer to '0' in the EXTENSIONS block of config/system/settings.php, and write all three keys — useDevServer, devServerUri and defaultManifest. The default auto resolves to Environment::getContext()->isDevelopment(), so any Development context makes <vite:asset> chase a dev server. A key missing from settings.php makes ExtensionConfiguration::get() synchronize and write the file, which on a sealed file throws #1346323822 (settings.php is not writable) and returns HTTP 500.",
+      "failing": [
+        "Just set useDevServer = 0 in settings.php; the other keys keep their defaults and nothing else is needed.",
+        "Delete config/system/settings.php and let TYPO3 regenerate it with the correct extension configuration."
+      ]
+    }
+  },
+  {
+    "name": "default-manifest-path-alignment",
+    "prompt": "Where does vite-plugin-typo3 project mode write the build output and manifest for a TYPO3 site, and do I need to pass a manifest argument to the vite:asset ViewHelper?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "_assets/vite/",
+        "description": "Names the project-mode output directory below the public web dir"
+      },
+      {
+        "type": "content_contains",
+        "value": ".vite/manifest.json",
+        "description": "Names the manifest path inside that output directory"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(no|without|not) (need|require).{0,30}manifest|default",
+        "description": "States that the ViewHelper needs no manifest argument because the defaults align"
+      }
+    ]
+  },
+  {
+    "name": "entrypoint-per-content-element",
+    "prompt": "How should I structure Vite entrypoints for a TYPO3 sitepackage that has an accordion, a slider and a video content element?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "\\.entry\\.(ts|js)",
+        "description": "Uses the *.entry.ts entrypoint naming convention"
+      },
+      {
+        "type": "content_contains",
+        "value": "Resources/Private/Entrypoints",
+        "description": "Places entrypoints in Resources/Private/Entrypoints"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)code split|only.{0,40}(loaded|needed)|per (content element|CE)",
+        "description": "Explains the point of one entrypoint per content element: only visible elements load their CSS and JS"
+      }
+    ]
+  },
+  {
+    "name": "selective-bootstrap-imports",
+    "prompt": "In our sitepackage SCSS we currently have @import 'bootstrap'; at the top of main.scss. Is that fine?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "(?i)(never|don't|do not|avoid) .{0,30}(whole|entire|all of bootstrap|@import 'bootstrap')|selective",
+        "description": "Rejects importing Bootstrap as a whole in favour of selective imports"
+      },
+      {
+        "type": "content_regex",
+        "value": "bootstrap/scss/",
+        "description": "Shows the per-component import path"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)bundle size|payload|smaller|unused",
+        "description": "Gives the reason: the unused components otherwise ship in the CSS bundle"
+      }
+    ]
+  },
+  {
+    "name": "bootstrap-variable-override-order",
+    "prompt": "I set $primary in Theme/_theme-main.scss after the Bootstrap imports but my buttons stay blue. What is wrong?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "(?i)before|order",
+        "description": "Identifies import order as the defect: variables must be defined before Bootstrap processes them"
+      },
+      {
+        "type": "content_regex",
+        "value": "_variables|Basic/variables|global-basics",
+        "description": "Names the earlier partial the override belongs in"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(default|!default|post-bootstrap|after)",
+        "description": "Distinguishes variable overrides before Bootstrap from style overrides after it"
+      }
+    ]
+  },
+  {
+    "name": "svg-optimize-source-and-target",
+    "prompt": "Set up SVG optimization in our TYPO3 sitepackage Vite build. Which directories are involved?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "Resources/Private/Svg",
+        "description": "Reads the unoptimized sources from Resources/Private/Svg"
+      },
+      {
+        "type": "content_contains",
+        "value": "Resources/Public/Svg",
+        "description": "Writes the optimized output to Resources/Public/Svg"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)svgo",
+        "description": "Names SVGO as the optimizer behind the plugin"
+      }
+    ]
+  },
+  {
+    "name": "csp-nonce-via-viewhelper",
+    "prompt": "Our TYPO3 site enforces a strict Content Security Policy. How do we include the Vite-built CSS and JS without CSP violations?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "vite:asset",
+        "description": "Uses the vite:asset ViewHelper for inclusion"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)nonce",
+        "description": "Explains that the ViewHelper adds the nonce automatically"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(no|without) inline",
+        "description": "Rules out hand-written inline script or style tags"
+      }
+    ]
+  },
+  {
+    "name": "build-config-at-project-root-for-docker",
+    "prompt": "Our Dockerfile COPYs the sitepackage extension directory into the image and the build got huge and slow. package.json and vite.config.js currently live inside that extension. What do you recommend?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "(?i)(composer )?project root|repository root|top level",
+        "description": "Moves the build configuration to the Composer project root"
+      },
+      {
+        "type": "content_contains",
+        "value": "node_modules",
+        "description": "Names node_modules as what must not sit inside a COPYed path"
+      },
+      {
+        "type": "content_regex",
+        "value": "_assets/vite|built (output|assets)",
+        "description": "States that only the built output needs to ship in the image"
+      }
+    ]
+  },
+  {
+    "name": "scss-modern-compiler-api",
+    "prompt": "Which Sass API should the css preprocessorOptions in a TYPO3 Vite 7 setup use, and why?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "modern-compiler",
+        "description": "Selects the modern compiler API"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)preprocessorOptions|scss",
+        "description": "Places it in the css preprocessorOptions for scss"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(deprecat|legacy|faster|performance)",
+        "description": "Gives a reason rather than only the setting"
+      }
+    ]
+  },
+  {
+    "name": "production-only-compression-plugins",
+    "prompt": "Add Gzip and Brotli output to our TYPO3 sitepackage Vite config.",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "gzip",
+        "description": "Configures gzip compression"
+      },
+      {
+        "type": "content_regex",
+        "value": "brotli",
+        "description": "Configures brotli compression"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)production|isProduction|mode ===|build only|NODE_ENV",
+        "description": "Gates the compression plugins on a production build instead of running them in dev"
+      }
+    ]
+  },
+  {
+    "name": "postcss-cssnano-production-only",
+    "prompt": "Configure PostCSS for our TYPO3 sitepackage Vite build. Which plugins, and should they all run in development too?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "autoprefixer",
+        "description": "Runs autoprefixer for vendor prefixes"
+      },
+      {
+        "type": "content_contains",
+        "value": "cssnano",
+        "description": "Uses cssnano for minification"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(production|isProduction|NODE_ENV).{0,80}cssnano|cssnano.{0,80}(production|isProduction)",
+        "description": "Gates cssnano on a production build while autoprefixer always runs, so dev output stays readable and fast"
+      }
+    ]
+  },
+  {
+    "name": "fonts-loaded-locally",
+    "prompt": "Our TYPO3 sitepackage currently pulls Open Sans from Google Fonts. How should fonts be loaded instead?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "(?i)local|self-host|Resources/Public/Fonts",
+        "description": "Self-hosts the font files in the sitepackage instead of a third-party request"
+      },
+      {
+        "type": "content_contains",
+        "value": "@font-face",
+        "description": "Declares the faces via @font-face"
+      },
+      {
+        "type": "content_regex",
+        "value": "woff2",
+        "description": "Names woff2 as the primary format"
+      }
+    ]
+  },
+  {
+    "name": "svg-watch-changed-file-guard",
+    "prompt": "Our custom Vite SVG copy/optimize plugin re-processes the entire SVG directory on every dev-server file event and it is slow. What is the fix in the plugin's watch handling?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "changedFile",
+        "description": "Uses the changedFile argument to process only what changed"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(guard|check|only|single)",
+        "description": "Processes a single file when one is named rather than the whole directory"
+      },
+      {
+        "type": "content_regex",
+        "value": "(?i)(change|add)\\b",
+        "description": "Handles the dev-server change and add events explicitly"
+      }
+    ]
+  }
+]
