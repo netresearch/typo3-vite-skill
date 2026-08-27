@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-27
+
+### Added
+
+- First eval suite
+
 ## [1.8.0] - 2026-08-08
 
 ### Added

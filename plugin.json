@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "typo3-vite",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Vite build setup, SCSS architecture, Bootstrap theming for TYPO3 v13+",
   "author": {
     "name": "Netresearch DTT GmbH",
