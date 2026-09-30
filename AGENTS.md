@@ -11,8 +11,11 @@ typo3-vite-skill/
 ├── skills/typo3-vite/          # Skill definition and references
 │   ├── SKILL.md                # Skill metadata, trigger description, inline guidance
 │   └── references/             # Extended documentation (vite config, SCSS, Bootstrap theming)
+├── plugin.json                 # Agent Plugins manifest, source of truth for name, version, license
 ├── .claude-plugin/
-│   └── plugin.json             # Plugin metadata (name, version, license)
+│   └── plugin.json             # Claude Code manifest; shared fields must match plugin.json
+├── evals/evals.json            # Eval cases for the skill's answers
+├── docs/SECURITY-ASSURANCE.md  # Security assurance case
 ├── .github/workflows/          # CI caller workflows (all call netresearch/skill-repo-skill reusable workflows)
 ├── composer.json               # Composer package definition (type: ai-agent-skill)
 ├── LICENSE-MIT                 # MIT license (applies to code, configs, CI workflows)
@@ -26,7 +29,7 @@ No Makefile. Key operations:
 
 - Install PHP dependencies: `composer install`
 - Validate skill repo structure: run `skill-repo-skill`'s `validate-skill.sh` against repo root
-- Release: bump `.claude-plugin/plugin.json` version, open PR, merge, signed tag `vX.Y.Z`, push tag — the `release.yml` caller builds the GitHub release
+- Release: bump the version in `plugin.json` and `.claude-plugin/plugin.json` together (Skill Validation fails when they differ), open PR, merge, signed tag `vX.Y.Z`, push tag — the `release.yml` caller builds the GitHub release
 
 ## Rules
 
