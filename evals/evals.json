@@ -4,9 +4,14 @@
     "prompt": "Our TYPO3 sitepackage runs Vite behind Traefik and the dev server answers 403 \"Blocked request\" for every host except localhost. Our vite.config.ts already has a `server: { host: '0.0.0.0', port: 5173, strictPort: true }` block. Show me what to change.",
     "assertions": [
       {
-        "type": "content_contains",
-        "value": "allowedHosts",
-        "description": "Names allowedHosts as the option that resolves the host-header rejection"
+        "type": "content_regex",
+        "value": "allowedHosts: ?\\[",
+        "description": "Resolves the host-header rejection with an explicit allowedHosts list of the proxy's hostnames"
+      },
+      {
+        "type": "content_regex",
+        "value": "(never|do not|don't|avoid|instead of)[^.]{0,60}allowedHosts: ?true|allowedHosts: ?true[^.]{0,80}(rebinding|any (host|website|site))",
+        "description": "Advises against allowedHosts: true, which lets any website reach the dev server through DNS rebinding"
       },
       {
         "type": "content_regex",
@@ -21,13 +26,14 @@
       {
         "type": "content_regex",
         "value": "7\\.3|8\\.x|host header|proxy",
-        "description": "Ties the 403 to host-header enforcement from Vite 7.3 onwards behind a reverse proxy"
+        "description": "Ties the 403 to host-header enforcement behind a reverse proxy"
       }
     ],
     "samples": {
-      "passing": "Add allowedHosts inside the existing server block — define server exactly once, because a second server: { ... } literal silently overwrites the first one's options and you would lose host and strictPort. Vite enforces the host header from 7.3 onwards, so behind a proxy every host but localhost gets a 403 until allowedHosts is set.",
+      "passing": "Add allowedHosts: ['.your-domain.test'] inside the existing server block — define server exactly once, because a second server: { ... } literal silently overwrites the first one's options and you would lose host and strictPort. Vite checks the host header, so behind a proxy every host but localhost gets a 403 until it is listed. Do not use allowedHosts: true: it lets any website reach the dev server through DNS rebinding.",
       "failing": [
         "Add a second server block below the existing one containing allowedHosts: true. Object keys merge, so both sets of options apply.",
+        "Set allowedHosts: true inside the existing server block so the dev server answers every host behind the proxy.",
         "That is a Traefik misconfiguration. Set the X-Forwarded-Host header in your router and restart the proxy."
       ]
     }

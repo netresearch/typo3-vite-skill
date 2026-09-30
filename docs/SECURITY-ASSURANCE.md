@@ -64,6 +64,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 | Weakness | Where it could arise | Countermeasure |
 |----------|---------------------|----------------|
 | CWE-79 cross-site scripting | Frontend assets of the user's site | The guidance loads every asset through `<vite:asset>` with a CSP nonce and uses no inline scripts or styles (`references/vite-configuration.md`, "CSP Compliance"). |
+| CWE-942 permissive cross-domain policy | Vite dev server configuration in the user's project | `allowedHosts` and `cors` list the DDEV domain instead of `true`, so other websites cannot reach the dev server through DNS rebinding or cross-origin requests (`references/vite-configuration.md`, `SKILL.md` "Dev Server `allowedHosts` Trap"). |
 | CWE-78 OS command injection | Shell commands in the references | The three commands take no input from files or the network except the `<host>` placeholder the user fills in; no command string is evaluated. |
 | CWE-798 credential exposure | Commits to this repository | GitHub secret scanning with push protection is enabled for the repository. No file reads or stores credentials. |
 | CWE-829 inclusion of functionality from an untrusted source | CI workflows | The workflows call shared workflows inside the `netresearch` organisation; those pin third-party actions by commit SHA. |
@@ -72,6 +73,6 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 ## What the skill does not protect against
 
 - **The user's dependencies.** The references name npm packages (Vite and its plugins, SVGO, Bootstrap) and `praetorius/vite-asset-collector` without pinning versions. The user's project selects, locks and audits them.
-- **The development server.** The `server:` block in `references/vite-configuration.md` configures a local development server behind a reverse proxy. The skill does not cover hardening that server or exposing it beyond a development environment.
+- **The development server.** The `server:` block in `references/vite-configuration.md` configures a local development server behind a reverse proxy. It restricts `allowedHosts` and `cors` to the DDEV domain and tells the agent never to use `allowedHosts: true` or `cors: true`; `evals/evals.json` asserts that answer. Beyond that, the skill does not cover hardening the server or exposing it outside a development environment.
 - **Instructions inside project files.** The agent reads the project's files. The skill does not defend against text in those files that tries to steer the agent; that is the agent platform's responsibility.
 - **`allowed-tools`.** `SKILL.md` declares none. Where a skill declares `allowed-tools`, it only pre-approves tools; it does not remove tools the agent already has.

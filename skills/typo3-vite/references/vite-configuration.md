@@ -89,20 +89,37 @@ export default defineConfig({
         ] : []),
     ],
     server: {
+        // Listen on all interfaces of the container: with the default
+        // 'localhost', Vite listens on the container's loopback only and the
+        // reverse proxy (DDEV router, Traefik) cannot reach it.
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,
         origin: 'http://localhost:5173',
-        // Required (all Vite 7.x/8.x) when accessed via reverse proxy (Traefik etc.)
-        // Without these, the dev server returns HTTP 403 "Blocked request" for any
-        // host header other than 'localhost' — even if the host appears to be
-        // routed correctly. true = allow all hosts (use array for narrower scope).
-        allowedHosts: true,
-        cors: true,
+        // Host header check: without the proxy's hostname here, Vite answers
+        // HTTP 403 "Blocked request. This host (...) is not allowed."
+        // A leading dot allows the domain and all its subdomains.
+        allowedHosts: ['.ddev.site'],
+        // Which page origins may load dev-server assets cross-origin. The
+        // default allows localhost origins only.
+        cors: { origin: /^https?:\/\/(?:[^:]+\.)?ddev\.site(?::\d+)?$/ },
     },
 });
 ```
 
+> **Allow the proxy's hostnames, never every host.** Vite checks the `Host`
+> header of every dev-server request against `server.allowedHosts`;
+> `localhost`, names under `.localhost` and IP addresses pass by default, any
+> other name gets the 403 "Blocked request". `.ddev.site` covers every DDEV
+> project host, including `additional_hostnames`; a name added through
+> `additional_fqdns` or a changed `project_tld` goes into the list as well
+> (and into the `cors` regex). Do not set `allowedHosts: true` or
+> `cors: true`: the Vite documentation warns that `allowedHosts: true` lets any
+> website reach the dev server through DNS rebinding and `cors: true` lets any
+> website send requests to it, in both cases downloading your source code.
+> `cors` does not cause the 403; it decides whether the browser lets a page on
+> the DDEV origin load modules from the dev server.
+>
 > **Anti-pattern: duplicate `server:` blocks.** Define `server:` exactly once in
 > `defineConfig({ ... })`. JavaScript object literals **silently overwrite**
 > earlier keys with later ones, so two `server: { ... }` blocks lose the first
