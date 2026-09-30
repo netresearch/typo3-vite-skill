@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
 # Bootstrap Theming Guide
 
 Standard approach for customizing Bootstrap 5.3+ in sitepackage projects.

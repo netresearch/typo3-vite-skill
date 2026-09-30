@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
 # typo3-vite-skill
 
 Vite 7 build configuration for TYPO3 v13/v14 LTS sitepackage development with `praetorius/vite-asset-collector`, distributed as a Claude Code skill. Covers SCSS architecture, Bootstrap 5.3 theming, SVG optimization, PostCSS, code splitting, and CSP compliance.

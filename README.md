@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!-- SPDX-FileCopyrightText: Netresearch DTT GmbH -->
 # typo3-vite-skill
 
 Vite build setup, SCSS architecture, and Bootstrap 5 theming for TYPO3 v13+ sitepackage development.
