@@ -14,7 +14,7 @@ This document states what users of the typo3-vite skill can and cannot expect in
 | Evaluation cases | `evals/evals.json` | No. Prompts and expected answer patterns, validated in CI; not loaded by the skill. |
 | Manifests | `plugin.json`, `.claude-plugin/plugin.json`, `composer.json` | No. Package metadata. |
 
-The repository contains no scripts and no executable program. There is no code path in this repository that parses untrusted input.
+The skill contains no scripts and no executable program, so a user of the skill runs no code from this repository. Untrusted input is parsed only in CI: on every pull request the workflows here call shared workflows of `netresearch/skill-repo-skill`, which check out the pull request and run linters and validators over its Markdown, YAML and JSON files with `contents: read` (see requirement 5).
 
 ## Actors and trust boundaries
 
