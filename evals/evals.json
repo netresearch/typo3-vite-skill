@@ -39,6 +39,29 @@
     }
   },
   {
+    "name": "dev-server-cors-explicit-origins",
+    "prompt": "Our TYPO3 page at https://shop.ddev.site loads its Vite dev-server modules from https://shop.ddev.site:5173, and the browser console reports a CORS error for every module. A colleague suggests adding `cors: true` to the server block of vite.config.ts. Should we?",
+    "assertions": [
+      {
+        "type": "content_regex",
+        "value": "cors: ?\\{ ?origin",
+        "description": "Allows the DDEV page origin explicitly through server.cors.origin"
+      },
+      {
+        "type": "content_regex",
+        "value": "(never|do not|don't|avoid|instead of|no\\b)[^.]{0,60}cors: ?true|cors: ?true[^.]{0,80}(any (website|site|origin)|source)",
+        "description": "Advises against cors: true, which lets any website send requests to the dev server and read the sources"
+      }
+    ],
+    "samples": {
+      "passing": "No. Do not use cors: true: it lets any website send requests to the dev server and read your sources. Inside the existing server block, allow the DDEV origin instead: cors: { origin: /^https?:\\/\\/(?:[^:]+\\.)?ddev\\.site(?::\\d+)?$/ }. The default allows localhost origins only, which is why the page on shop.ddev.site is refused.",
+      "failing": [
+        "Yes, set cors: true in the server block so every origin can load the modules.",
+        "Add an Access-Control-Allow-Origin: * header in a Traefik middleware and restart the router."
+      ]
+    }
+  },
+  {
     "name": "v14-requires-external-build-tool",
     "prompt": "We are upgrading a TYPO3 site to v14 and want to drop Vite again, going back to config.concatenateCss and config.compressJs in TypoScript. Any reason not to?",
     "assertions": [
