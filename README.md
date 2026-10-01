@@ -82,7 +82,7 @@ Checks that run on pull requests in this repository:
 - DCO: every commit carries a `Signed-off-by` trailer.
 - CodeQL default setup (a repository setting, not a workflow file) analyses the GitHub Actions workflows with the extended query suite.
 - PR Quality Gates (`pr-quality.yml`, on `pull_request_target`): approves pull requests whose author has write, maintain or admin access.
-- Auto-merge dependency PRs (`auto-merge-deps.yml`, on `pull_request_target`): approves and merges pull requests from Renovate and Dependabot through the shared workflow in `netresearch/.github`, and is skipped for every other author.
+- Auto-merge dependency PRs (`auto-merge-deps.yml`, on `pull_request_target`): approves and merges pull requests from Renovate and Dependabot through the shared workflow in `netresearch/.github`; it is skipped for every other author and for pull requests labelled `deps-no-automerge` or `deps-major`.
 - A repository ruleset requests a Copilot code review when a pull request is opened for review or leaves draft; it does not require the review to pass.
 - CodeRabbit (a GitHub App configured for the organisation, not a workflow file) reviews pull requests and reports a `CodeRabbit` status; it is not a required check.
 - Branch protection on `main` requires Skill Validation, Eval Validation, CodeQL `Analyze (actions)` and DCO to pass on a branch that is up to date with `main`, and requires signed commits; it is not enforced for repository admins.
