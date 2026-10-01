@@ -109,9 +109,10 @@ export default defineConfig({
 
 > **Allow the proxy's hostnames, never every host.** Vite checks the `Host`
 > header of every dev-server request against `server.allowedHosts`;
-> `localhost`, names under `.localhost`, IP addresses and the hosts named in
-> `server.host`, `server.hmr.host` and `server.origin` pass by default, any
-> other name gets the 403 "Blocked request". A dev server that serves HTTPS
+> `localhost`, names under `.localhost`, IP addresses, the hosts named in
+> `server.host`, `server.hmr.host`, `preview.host` and `server.origin`, and
+> those in the `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` environment variable
+> pass by default, any other name gets the 403 "Blocked request". A dev server that serves HTTPS
 > itself skips the check. `.ddev.site` covers every DDEV
 > project host, including `additional_hostnames`; a name added through
 > `additional_fqdns` or a changed `project_tld` goes into the list as well
