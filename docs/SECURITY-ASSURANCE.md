@@ -14,7 +14,7 @@ This document states what users of the typo3-vite skill can and cannot expect in
 | Evaluation cases | `evals/evals.json` | No. Prompts and expected answer patterns, validated in CI; not loaded by the skill. |
 | Manifests | `plugin.json`, `.claude-plugin/plugin.json`, `composer.json` | No. Package metadata. |
 
-The skill contains no scripts and no executable program, so a user of the skill runs no code from this repository. Untrusted input is parsed only in CI: on every pull request the workflows here call shared workflows of `netresearch/skill-repo-skill`, which check out the pull request and run linters and validators over its Markdown, YAML and JSON files with `contents: read` (see requirement 5).
+The skill contains no scripts and no executable program, so a user of the skill runs no code from this repository. Two places parse untrusted input. In CI, on every pull request the workflows here call shared workflows of `netresearch/skill-repo-skill`, which check out the pull request and run linters and validators over its Markdown, YAML and JSON files with `contents: read` (see requirement 5). On the user's machine, the `grep` in the reference parses the HTML of the site's start page, and the project's own build tools (Vite, its plugins, SVGO) process the project's files; none of that is code shipped here.
 
 ## Actors and trust boundaries
 
@@ -57,7 +57,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 
 ### 5. Pull requests pass the required checks
 
-Branch protection on `main` (a repository setting) requires a pull request, signed commits, and passing Skill Validation, Eval Validation, CodeQL `Analyze (actions)` and DCO checks on a branch that is up to date with `main`. It is not enforced for repository admins, so an admin can merge without them. Harness Verification runs on every pull request but is not a required check. A repository ruleset blocks deleting and force-pushing `main` and requests a Copilot review when a pull request is opened for review or leaves draft; it does not require that review to pass.
+Branch protection on `main` (a repository setting) requires a pull request, signed commits, and passing Skill Validation, Eval Validation, CodeQL `Analyze (actions)` and DCO checks on a branch that is up to date with `main`. It is not enforced for repository admins, so an admin can merge without them. Harness Verification runs on every pull request into `main` but is not a required check. A repository ruleset blocks deleting and force-pushing `main` and requests a Copilot review when a pull request is opened for review or leaves draft; it does not require that review to pass.
 
 `validate.yml`, `eval-validate.yml` and `harness-verify.yml` grant `contents: read` only. Two workflows run on `pull_request_target` and call shared workflows that contain no checkout step, so they run no pull request code: `auto-merge-deps.yml` (shared workflow in `netresearch/.github`, acts only on pull requests opened by Renovate or Dependabot) and `pr-quality.yml` (shared workflow in `netresearch/skill-repo-skill`, approves pull requests whose author has write access, with `pull-requests: write`). The checks themselves are listed in [README.md](../README.md#governance-and-policies).
 
