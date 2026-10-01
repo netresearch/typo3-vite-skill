@@ -32,7 +32,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 2. The skill asks for, stores and transmits no credentials.
 3. The frontend guidance keeps the Content Security Policy of the site intact.
 4. The skill and its releases are delivered unmodified from this repository.
-5. Changes reach `main` only through the checks listed in [README.md](../README.md#governance-and-policies).
+5. A pull request into `main` merges only with signed commits and with the checks that branch protection requires passing; repository admins can bypass this.
 
 ## Argument per requirement
 
@@ -55,7 +55,9 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 - The Skill Validation job checks that `plugin.json` and `.claude-plugin/plugin.json` agree and that the plugin version has a valid format.
 - Branch protection on `main` requires signed commits.
 
-### 5. Changes pass automated checks
+### 5. Pull requests pass the required checks
+
+Branch protection on `main` (a repository setting) requires a pull request, signed commits, and passing Skill Validation, Eval Validation, CodeQL `Analyze (actions)` and DCO checks on a branch that is up to date with `main`. It is not enforced for repository admins, so an admin can merge without them. Harness Verification runs on every pull request but is not a required check. A repository ruleset blocks deleting and force-pushing `main` and requests a Copilot review when a pull request is opened for review or leaves draft; it does not require that review to pass.
 
 `validate.yml`, `eval-validate.yml` and `harness-verify.yml` grant `contents: read` only. Two workflows run on `pull_request_target` and call shared workflows that contain no checkout step, so they run no pull request code: `auto-merge-deps.yml` (shared workflow in `netresearch/.github`, acts only on pull requests opened by Renovate or Dependabot) and `pr-quality.yml` (shared workflow in `netresearch/skill-repo-skill`, approves pull requests whose author has write access, with `pull-requests: write`). The checks themselves are listed in [README.md](../README.md#governance-and-policies).
 
