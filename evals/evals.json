@@ -44,8 +44,8 @@
     "assertions": [
       {
         "type": "content_regex",
-        "value": "cors: ?\\{ ?origin",
-        "description": "Allows the DDEV page origin explicitly through server.cors.origin"
+        "value": "cors: ?\\{ ?origin|origin: ?(/|\\[)",
+        "description": "Allows the DDEV page origin explicitly through server.cors.origin, on one line or with origin on its own line"
       },
       {
         "type": "content_regex",
