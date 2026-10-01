@@ -38,7 +38,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 
 ### 1. No executable code of its own
 
-`git ls-files` lists Markdown, JSON, YAML and licence files only; the Skill Validation job finds no shell script and no Python file to lint (`.github/workflows/validate.yml`). The commands the agent may run are the fenced `bash` blocks in `references/vite-configuration.md` ("Flush the page cache after every build"): `vendor/bin/typo3 cache:flush`, a `curl` of the site's start page piped into `grep`, and `ls` of the build output. The TypeScript, JavaScript and PHP blocks in the same file are configuration for the user's project, not code this repository runs.
+`git ls-files` lists Markdown, JSON, JSONC, YAML and licence files and `.gitignore`; the Skill Validation job finds no shell script and no Python file to lint (`.github/workflows/validate.yml`). The commands the agent may run are the fenced `bash` blocks in `references/vite-configuration.md` ("Flush the page cache after every build"): `vendor/bin/typo3 cache:flush`, a `curl` of the site's start page piped into `grep`, and `ls` of the build output. The TypeScript, JavaScript and PHP blocks in the same file are configuration for the user's project, not code this repository runs.
 
 ### 2. No credentials
 
@@ -46,7 +46,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 
 ### 3. Content Security Policy
 
-- `SKILL.md` ("CSP Compliance") and `references/vite-configuration.md` ("CSP Compliance") tell the agent to load assets through the `<vite:asset>` ViewHelper, which adds the CSP nonce, and to add no inline `<script>` or `<style>` tags.
+- `SKILL.md` ("CSP Compliance") and `references/vite-configuration.md` ("CSP Compliance") tell the agent to load assets through the `<vite:asset>` ViewHelper, which adds the CSP nonce, so that no inline `<script>` or `<style>` tags are needed.
 - The same section points CSP headers to TYPO3's Content-Security-Policy API or the web server configuration.
 
 ### 4. Delivered content is the reviewed content
@@ -68,7 +68,7 @@ Boundary 1 lies between the skill text and the user's project: the agent turns t
 | CWE-78 OS command injection | Shell commands in the references | The three commands take no input from files or the network except the `<host>` placeholder the user fills in; no command string is evaluated. |
 | CWE-798 credential exposure | Commits to this repository | GitHub secret scanning with push protection is enabled for the repository. No file reads or stores credentials. |
 | CWE-829 inclusion of functionality from an untrusted source | CI workflows | The workflows call shared workflows inside the `netresearch` organisation; those pin third-party actions by commit SHA. |
-| CWE-1104 unmaintained third-party components | Composer dependency and pinned tools | The only package dependency is `netresearch/composer-agent-skill-plugin` (`composer.json`); Renovate opens update pull requests for it and for the pre-commit hooks (`renovate.json`, `.pre-commit-config.yaml`). |
+| CWE-1104 unmaintained third-party components | Composer dependency and pinned tools | The only package dependency is `netresearch/composer-agent-skill-plugin`, required as `*` in `composer.json`, so every release satisfies the constraint and there is no version for Renovate to raise. Renovate opens update pull requests for the pre-commit hooks pinned in `.pre-commit-config.yaml` (`renovate.json`). |
 
 ## What the skill does not protect against
 
