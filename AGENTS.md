@@ -16,7 +16,7 @@ typo3-vite-skill/
 │   └── plugin.json             # Claude Code manifest; shared fields must match plugin.json
 ├── evals/evals.json            # Eval cases for the skill's answers
 ├── docs/SECURITY-ASSURANCE.md  # Security assurance case
-├── .github/workflows/          # CI caller workflows (all call netresearch/skill-repo-skill reusable workflows)
+├── .github/workflows/          # CI caller workflows (reusables of netresearch/skill-repo-skill, netresearch/.github and netresearch/typo3-ci-workflows)
 ├── composer.json               # Composer package definition (type: ai-agent-skill)
 ├── LICENSE-MIT                 # MIT license (applies to code, configs, CI workflows)
 ├── LICENSE-CC-BY-SA-4.0        # CC-BY-SA-4.0 (applies to skill content, docs, references)
@@ -36,7 +36,7 @@ No Makefile. Key operations:
 - Skill behavior is defined by [skills/typo3-vite/SKILL.md](skills/typo3-vite/SKILL.md) — its `description` field must begin with `Use when` to activate correctly in Claude Code.
 - Licensing follows the Netresearch split model: code under [LICENSE-MIT](LICENSE-MIT), documentation and skill content under [LICENSE-CC-BY-SA-4.0](LICENSE-CC-BY-SA-4.0). SPDX expression: `(MIT AND CC-BY-SA-4.0)`.
 - Do not add a `version` field to [composer.json](composer.json) — versions are derived from git tags by the Release workflow.
-- All CI workflows in [.github/workflows/](.github/workflows/) must remain thin callers of `netresearch/skill-repo-skill` reusable workflows — never inline actions in this repo.
+- All CI workflows in [.github/workflows/](.github/workflows/) must remain thin callers of reusable workflows in `netresearch/skill-repo-skill`, `netresearch/.github` or `netresearch/typo3-ci-workflows` — never inline actions in this repo.
 - Release discipline: tag only **after** the bump PR is merged to `main`; tag-before-bump runs the release against the wrong version and produces a locked broken release.
 - Vite is mandatory for TYPO3 v14 frontend assets: core asset concat/compression was removed in Breaking [#108055](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/14.0/Breaking-108055-RemovedFrontendAssetConcatenationAndCompression.html). Skill content must reflect this as a non-optional build step.
 - Conformance with the `skill-repo-skill` structural standard is enforced by the `validate.yml` caller on every PR.
