@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- **`references/vite-configuration.md`** new "RTE Stylesheet (CKEditor
+  `contentsCss`)" subsection: load the hashed `rte` entry into CKEditor via
+  `%vite('Resources/Private/Scss/rte.scss')%`, use the manifest key instead of an
+  `EXT:` path, and import the Bootstrap base layers in `rte.scss`.
+
 ## [1.8.1] - 2026-08-27
 
 ### Added

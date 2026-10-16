@@ -186,6 +186,46 @@ Include entrypoints in content element templates:
 
 The `main.entry.ts` is included in the page layout (loaded on every page).
 
+### RTE Stylesheet (CKEditor `contentsCss`)
+
+The `rte` entry in `vite.config.ts` builds the stylesheet for the CKEditor
+editing area. Its file name carries a content hash, so the RTE preset cannot
+point at a fixed path. `vite_asset_collector` ships a YAML placeholder that
+looks the file up in the manifest:
+
+```yaml
+# Configuration/RTE/Default.yaml
+editor:
+  config:
+    contentsCss: "%vite('Resources/Private/Scss/rte.scss')%"
+```
+
+- The argument is the **manifest key**, i.e. the source path relative to the
+  Vite root. When `vite.config.ts` lives in the extension, that is
+  `Resources/Private/Scss/rte.scss` without `EXT:` — an `EXT:` path is resolved
+  against the project root and does not match the key.
+- Without a second argument the placeholder reads the `defaultManifest` from the
+  extension configuration of `vite_asset_collector`; pass the manifest path as
+  second argument if the sitepackage uses another one.
+
+`rte.scss` needs the Bootstrap base layers so that headings, tables and
+utility classes like `text-center` (used by the alignment buttons) match the
+frontend:
+
+```scss
+// Resources/Private/Scss/rte.scss
+@import 'global-basics';
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/images';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/utilities/api';
+@import 'Basic/typography';
+@import 'Basic/images';
+@import 'Basic/tables';
+```
+
 ## SVG Optimization Plugin
 
 The custom `SvgCopyOptimizePlugin` processes SVGs from `Resources/Private/Svg/` to `Resources/Public/Svg/`:
