@@ -373,5 +373,28 @@
         "description": "Handles the dev-server change and add events explicitly"
       }
     ]
+  },
+  {
+    "name": "rte-contents-css-from-manifest",
+    "prompt": "Our TYPO3 sitepackage builds Resources/Private/Scss/rte.scss as a Vite entry with hashed file names (vite.config.ts lives in the extension). How do we load that stylesheet into the CKEditor editing area from the RTE preset YAML?",
+    "assertions": [
+      {
+        "type": "content_contains",
+        "value": "contentsCss",
+        "description": "Configures editor.config.contentsCss"
+      },
+      {
+        "type": "content_regex",
+        "value": "%vite\\(['\"]?Resources/Private/Scss/rte\\.scss",
+        "description": "Uses the %vite()% placeholder with the manifest key, not an EXT: path"
+      }
+    ],
+    "samples": {
+      "passing": "editor:\n  config:\n    contentsCss: \"%vite('Resources/Private/Scss/rte.scss')%\"",
+      "failing": [
+        "editor:\n  config:\n    contentsCss: \"%vite('EXT:my_sitepackage/Resources/Private/Scss/rte.scss')%\"",
+        "editor:\n  config:\n    contentsCss: 'EXT:my_sitepackage/Resources/Public/Build/css/rte-a1b2c3.css'"
+      ]
+    }
   }
 ]
