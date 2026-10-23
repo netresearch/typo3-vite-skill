@@ -1,6 +1,6 @@
 {
   "name": "typo3-vite",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "Vite build setup, SCSS architecture, Bootstrap theming for TYPO3 v13+",
   "author": {
     "name": "Netresearch DTT GmbH",
