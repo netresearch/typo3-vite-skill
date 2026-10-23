@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-10-23
+
 ### Added
 
 - **`references/vite-configuration.md`** new "RTE Stylesheet (CKEditor
