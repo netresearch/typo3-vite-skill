@@ -85,7 +85,7 @@ Checks that run on pull requests in this repository:
 - OpenSSF Scorecard (`scorecard.yml`): runs on pushes to `main` and `master` and weekly, not on pull requests.
 - Labeler (`labeler.yml`, on `pull_request_target`): applies labels from `.github/labeler.yml` through the shared workflow in `netresearch/.github`.
 - DCO: every commit carries a `Signed-off-by` trailer.
-- CodeQL default setup (a repository setting, not a workflow file) analyses the GitHub Actions workflows with the extended query suite.
+- CodeQL (the `codeql` job of `security.yml`) analyses the GitHub Actions workflows with the `security-and-quality` query suite.
 - PR Quality Gates (`pr-quality.yml`, on `pull_request_target`): approves pull requests whose author has write, maintain or admin access.
 - Auto-merge dependency PRs (`auto-merge-deps.yml`, on `pull_request_target`): approves and merges pull requests from Renovate and Dependabot through the shared workflow in `netresearch/.github`; it is skipped for every other author and for pull requests labelled `deps-no-automerge` or `deps-major`.
 - A repository ruleset requests a Copilot code review when a pull request is opened for review or leaves draft; it does not require the review to pass.
